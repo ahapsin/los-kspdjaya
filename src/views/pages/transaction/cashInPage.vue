@@ -38,7 +38,7 @@
       </n-form-item>
     </div>
     <div>
-      <n-data-table :row-props="rowProps" striped :row-class-name="rowClassName" size="small" :scroll-x="800"
+      <n-data-table :row-props="rowProps" striped :row-class-name="bg-pr" size="small" :scroll-x="800"
                     :row-key="(row) => row.loan_number" :columns="columns" :data="dataSearch" :max-height="140"
                     :on-update:checked-row-keys="handleFasilitas" :loading="loadSearch" class="pb-2"
                     v-show="dataFasilitas"/>
@@ -514,12 +514,7 @@ const createColumns = () => {
     // },
   ];
 };
-const rowClassName = (row) => {
-  if (row.loan_number == selectedFasilitas.value) {
-    return "row-active";
-  }
-  return "";
-};
+
 
 const parse = (input) => {
   const nums = input.replace(/,/g, "").trim();
@@ -812,4 +807,5 @@ const handleBack = () => {
   background-color: rgba(24, 160, 88, 0.2) !important;
   color: rgba(24, 160, 88, 1) !important;
 }
+
 </style>

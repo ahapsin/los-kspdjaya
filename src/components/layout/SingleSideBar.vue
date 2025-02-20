@@ -31,13 +31,6 @@
         </template>
         <template #extra>
           <div class="flex items-center">
-            <!-- <n-badge :value="1" :max="15" :offset="offset">
-              <n-button strong circle quaternary @click="collapse = !collapse">
-                <template #icon>
-                  <n-icon><alert-icon /></n-icon>
-                </template>
-              </n-button>
-            </n-badge> -->
             <account-avatar />
           </div>
         </template>
@@ -57,6 +50,7 @@
       </n-layout-sider>
       <n-layout class="bg-white p-2 md:p-4" :native-scrollbar="false">
         <RouterView />
+        <slot/>
       </n-layout>
     </n-layout>
   </n-layout>

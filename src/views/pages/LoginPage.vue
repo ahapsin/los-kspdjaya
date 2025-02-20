@@ -1,5 +1,7 @@
 <template>
-  <SingleSideBar v-if="logged"/>
+  <SingleSideBar v-if="logged">
+    <Dashboard/>
+  </SingleSideBar>
   <div v-else
        :style="`background-color: ${appAccentColor}`"
        :class="`h-screen flex items-center  justify-center max-h-screen p-8 md:p-20`"
@@ -18,6 +20,7 @@
 </template>
 <script setup>
 import {ref, onMounted} from 'vue';
+import Dashboard from './DashboardPage.vue';
 const appAccentColor = import.meta.env.VITE_APP_ACCENT_COLOR;
 const logged = ref(false);
 onMounted(() => {
