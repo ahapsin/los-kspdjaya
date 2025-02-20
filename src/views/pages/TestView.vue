@@ -2,23 +2,37 @@
   <div class="flex justify-center p-0 md:p-8 bg-gradient-to-tr from-blue-800 to-orange-500">
     <div
         class="p-8 h-screen border shadow rounded-none md:rounded-2xl w-[500px] flex bg-white justify-between flex-col">
-      <div class=" h-20 ">
-        <div class="text-2xl flex items-center   pb-8">
-          chat<span :class="indikator ? 'animate-bounce':'animate-none'"><b>Raimu</b></span>
+      <div class=" flex justify-between h-20 ">
+        <div class="text-2xl flex items-center pb-8">
+          chat<span :class="indikator ? 'animate-bounce':'animate-none'"><b>GPU</b></span>
         </div>
+        <n-button @click="activate('bottom')" type="error" secondary round class="animate-bounce" v-if="pushedErrorInvoice.length > 0">
+          cek disini yang error
+        </n-button>
+        <n-drawer v-model:show="active" :width="502" :placement="placement">
+          <n-drawer-content title="Error log">
+            <div v-for="errinv in pushedErrorInvoice">{{ errinv.no_invoice }}</div>
+          </n-drawer-content>
+        </n-drawer>
 
+        <div class="font-bold flex rounded-full w-[50px]" v-if="count > 0">
+          {{ count }} / {{ noInvoice != null ? noInvoice.length : null }}
+        </div>
       </div>
       <div class="flex flex-col gap-4 h-[600px] overflow-auto">
-        <div v-for="inv in pushedInvoice" class="flex justify-between bg-slate-50 p-2 rounded-full">
+        <div v-for="inv in pushedInvoice" class="flex justify-between bg-slate-50 p-2 rounded-full"
+             :class="inv.stts ? 'bg-slate-100':'bg-red-300 '">
           <span class="font-bold">{{ inv.no_invoice }}</span>
           <span>{{ dateFormat(inv.tgl) }}</span>
         </div>
-        <div v-if="pushedInvoice.length > 0" @click="pushedInvoice = []"
-             class="bg-slate-200  cursor-pointer font-bold  item-center flex w-fit p-2 rounded-full ">
-          <n-icon>
-            <close-icon/>
-          </n-icon>
-          <div>hapus log</div>
+        <div class="flex justify-center">
+          <div v-if="pushedInvoice.length > 0" @click="()=>{pushedInvoice = []; count=0;pushedErrorInvoice=[]}"
+               class="flex items-center bg-slate-200  cursor-pointer item-center p-2 rounded-full ">
+            <n-icon>
+              <close-icon/>
+            </n-icon>
+            <div>hapus log</div>
+          </div>
         </div>
       </div>
       <div class="">
@@ -29,7 +43,7 @@
           <div class="flex justify-between">
 
             <div v-if="noInvoice != null" class="border items-center font-bold flex w-fit px-4 rounded-full shadow">
-              {{ noInvoice != null ? noInvoice.length : null }} Invoice
+              {{ noInvoice != null ? noInvoice.length : null }} Invoices
             </div>
             <div v-else></div>
             <div class="flex gap-2">
@@ -61,11 +75,20 @@ import {ArrowUpwardRound as UpIcon, CloseRound as CloseIcon} from "@vicons/mater
 const message = useMessage();
 const textArea = ref();
 const pushedInvoice = ref([]);
+const pushedErrorInvoice = ref([]);
 const noInvoice = computed(() => {
   return textArea.value ? textArea.value.split(',').map(item => item.trim()) : null;
 });
+const active = ref(false);
+const placement = ref("right");
+const activate = (place) => {
+  active.value = true;
+  placement.value = place;
+};
+const count = ref(0);
 const indikator = ref(false);
 const eksekusi = async (e) => {
+  textArea.value=null;
   for (let invoice of e) {
     const response = await useApi({
       method: "POST",
@@ -77,11 +100,16 @@ const eksekusi = async (e) => {
     });
     if (!response.ok) {
       message.error('ERROR API');
+      const date = Date.now();
+      pushedErrorInvoice.value.push({no_invoice: invoice, tgl: date, stts: false});
+      pushedInvoice.value.push({no_invoice: invoice, tgl: date, stts: false});
+      count.value += 1;
     } else {
       textArea.value = null;
       message.success(invoice);
       const date = Date.now();
-      pushedInvoice.value.push({no_invoice: invoice, tgl: date});
+      pushedInvoice.value.push({no_invoice: invoice, tgl: date, stts: true});
+      count.value += 1;
     }
 
   }
