@@ -13,10 +13,10 @@
             </n-button>
             <img
               class="h-14 md:h-12"
-              src="../../assets/logo.png"
+              :src="applogo"
               alt="logo_company"
             />
-            KSPDJAYA
+            {{apptitle}}
           </n-space>
           <span class="hidden md:flex capitalize"></span>
         </template>

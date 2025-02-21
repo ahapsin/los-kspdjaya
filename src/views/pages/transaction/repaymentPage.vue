@@ -132,9 +132,9 @@
           <div class="p-2">
             <div class="flex items-center gap-2 pb-2 justify-between border-b border-dashed border-black">
               <div class="flex gap-2 items-center">
-                <img class="h-10 md:h-10" src="../../../assets/logo.png" alt="logo_company"/>
+                <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
                 <div class="flex flex-col">
-                  <span class="text-xl font-bold">KSPDJAYA</span>
+                  <span class="text-xl font-bold">{{applogo}}</span>
                   <n-text strong class="text-md"> POS: {{ bodyModal.cabang }}</n-text>
                 </div>
               </div>
@@ -320,7 +320,8 @@ import {
 } from "@vicons/material";
 import {useWindowSize} from "@vueuse/core";
 import {NImage, useLoadingBar} from "naive-ui";
-
+const apptitle = import.meta.env.VITE_APP_TITLE;
+const applogo = import.meta.env.VITE_APP_LOGO;
 const loadingBar = useLoadingBar();
 import {useMessage, NIcon, NTag, NButton, NInput} from "naive-ui";
 import {computed, onMounted, reactive, ref, h} from "vue";

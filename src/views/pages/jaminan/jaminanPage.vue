@@ -125,9 +125,9 @@
           <div v-else>
             <div class="bg-white border border-black p-4" ref="buktiTerimaRef">
               <div class="flex gap-2 items-center">
-                <img class="h-10 md:h-10" src="../../../assets/logo.png" alt="logo_company"/>
+                <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
                 <div class="flex flex-col">
-                  <span class="text-xl font-bold">KSPDJAYA</span>
+                  <span class="text-xl font-bold">apptitle</span>
                   <n-text strong class="text-md"> POS: {{ bodyModal.lokasi }}</n-text>
                 </div>
               </div>
@@ -283,10 +283,10 @@
         <div class="flex gap-2 p-4">
           <img
               class="h-10 md:h-10"
-              src="../../../assets/logo.png"
+              :src="applogo"
               alt="logo_company"
           />
-          <span class="text-2xl font-bold">KSPDJAYA</span>
+          <span class="text-2xl font-bold">{{apptitle}}</span>
         </div>
         <n-table :bordered="false" :single-line="false" size="small">
           <thead>
@@ -416,7 +416,8 @@ import {useSearch} from '../../../helpers/searchObject';
 import {reactive} from 'vue';
 import {useVueToPrint} from "vue-to-print";
 import {useMeStore} from "../../../stores/me.js";
-
+const apptitle = import.meta.env.VITE_APP_TITLE;
+const applogo = import.meta.env.VITE_APP_LOGO;
 const me = useMeStore();
 const message = useMessage();
 const showModal = ref(false);

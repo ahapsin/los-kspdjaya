@@ -201,8 +201,8 @@
               <div
                   class="flex items-center gap-2 pb-2 justify-between border-b border-dashed border-black">
                 <div class="flex gap-2 items-center">
-                  <img class="h-10 md:h-10" src="../../../assets/logo.png" alt="logo_company"/>
-                  <span class="text-xl font-bold">KSPDJAYA</span>
+                  <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
+                  <span class="text-xl font-bold">{{apptitle}}</span>
                 </div>
 
               </div>
@@ -356,7 +356,8 @@ import {
 } from "naive-ui";
 import {computed, reactive, ref, h, onMounted} from "vue";
 import {useVueToPrint} from "vue-to-print";
-
+const apptitle = import.meta.env.VITE_APP_TITLE;
+const applogo = import.meta.env.VITE_APP_LOGO;
 const searchField = ref(false);
 const checkedRowCredit = ref([]);
 const spinnerShow = ref(true);
@@ -598,7 +599,6 @@ const pelunasan = reactive({
   TUNGGAKAN_BUNGA: 0,
   DENDA: 0,
   PINALTI: 0,
-
   UANG_PELANGGAN: 0,
   DISKON: 0,
   BAYAR_POKOK: 0,

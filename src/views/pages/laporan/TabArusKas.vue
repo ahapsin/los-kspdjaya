@@ -30,9 +30,9 @@
         <div
             class="flex items-center gap-2 justify-between">
           <div class="flex gap-2 items-center py-4">
-            <img class="h-10 md:h-10" src="../../../assets/logo.png" alt="logo_company"/>
+            <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
             <div class="flex flex-col">
-              <n-text class="text-xl font-bold">KSPDJAYA</n-text>
+              <n-text class="text-xl font-bold">{{apptitle}}</n-text>
               <n-text class="text-md font-bold">POS : {{ me.me.cabang_nama }}</n-text>
             </div>
           </div>
@@ -121,7 +121,8 @@ import _ from "lodash";
 import {useApi} from "../../../helpers/axios.js";
 import {useMessage} from "naive-ui";
 import {useMeStore} from "../../../stores/me.js";
-
+const apptitle = import.meta.env.VITE_APP_TITLE;
+const applogo = import.meta.env.VITE_APP_LOGO;
 const rangeDate = ref();
 const emit = defineEmits();
 const message = useMessage();

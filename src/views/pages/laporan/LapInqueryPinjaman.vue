@@ -13,9 +13,9 @@
               <div
                   class="flex items-center gap-2 pb-2 justify-between border-b border-dashed border-black">
                 <div class="flex gap-2 items-center">
-                  <img class="h-10 md:h-10" src="../../../assets/logo.png" alt="logo_company"/>
+                  <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
                   <div class="flex-col">
-                    <div class="text-xl font-bold">KSPDJAYA</div>
+                    <div class="text-xl font-bold">{{apptitle}}</div>
                     <div class="small">POS {{ me.me.cabang_nama }}</div>
                   </div>
                 </div>
@@ -243,7 +243,8 @@ import TabInqPinjaman from "./TabInqPinjaman.vue";
 
 import {useMeStore} from "../../../stores/me.js";
 import {useVueToPrint} from "vue-to-print";
-
+const apptitle = import.meta.env.VITE_APP_TITLE;
+const applogo = import.meta.env.VITE_APP_LOGO;
 const message = useMessage();
 const me = useMeStore();
 const dataArusKas = ref([]);
