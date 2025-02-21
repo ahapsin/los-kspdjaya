@@ -20,7 +20,7 @@ const routes = [
     {
         path: "/dashboard",
         name: "dashboard",
-        component: () => import("../views/pages/DashboardPage.vue"),
+        component: () => import("../views/pages/LoginPage.vue"),
     },
     {
         path: "/exp-transaction",

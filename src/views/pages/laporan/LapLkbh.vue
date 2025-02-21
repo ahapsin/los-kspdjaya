@@ -6,7 +6,7 @@
     <div>
       <n-space vertical :size="12" class="pt-4">
         <n-space>
-          <n-date-picker v-model:formatted-value="rangeDate" :default-value="Date.now()" clearable format="yyyy-MM-dd"
+          <n-date-picker v-model:value="rangeDate" :default-value="Date.now()" clearable
                          start-placeholder="dari" end-placeholder="sampai"/>
           <n-select
               v-show="me.me.cabang_nama == 'Head Office'"
@@ -36,7 +36,7 @@
             <div class="flex gap-2 items-center py-4">
               <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
               <div class="flex flex-col">
-                <n-text class="text-xl font-bold">{{apptitle}}</n-text>
+                <n-text class="text-xl font-bold">{{ apptitle }}</n-text>
                 <n-text class="text-md font-bold">POS : {{ me.me.cabang_nama }}</n-text>
               </div>
             </div>
@@ -187,23 +187,17 @@ const getBranch = async () => {
     message.error("ERROR API");
   } else {
     loadingBranch.value = false;
-
-    if (me.me.cabang_nama != "Head Office") {
-      defBranch.value = me.me.cabang_nama;
-      selectBranch.value = me.me.cabang_id;
-    } else {
-      selectBranch.value = "SEMUA CABANG";
-      dataBranch.value = response.data.response;
-      dataBranch.value.unshift({
-        id: "SEMUA CABANG",
-        nama: "SEMUA CABANG"
-      });
-    }
+    me.me.cabang_nama != "Head Office" ? selectBranch.value = me.me.cabang_id : selectBranch.value = "SEMUA CABANG";
+    dataBranch.value = response.data.response;
+    dataBranch.value.unshift({
+      id: "SEMUA CABANG",
+      nama: "SEMUA CABANG"
+    });
   }
 }
 onMounted(() => {
   loadingBar.finish();
-  getBranch()
+  getBranch();
 });
 const handleSubmit = () => {
   let a = {
