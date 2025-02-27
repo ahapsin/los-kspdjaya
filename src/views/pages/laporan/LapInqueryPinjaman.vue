@@ -72,7 +72,7 @@
                     </th>
 
                     <th align="right">
-                      {{ dataFooter.ttlAmtAngs.toLocaleString()}}
+                      {{ dataFooter.ttlAmtBayar.toLocaleString()}}
                     </th>
                     <th align="right">
                       {{ dataFooter.ttlSisaAngs.toLocaleString() }}
