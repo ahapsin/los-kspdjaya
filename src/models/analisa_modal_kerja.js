@@ -1,6 +1,4 @@
 export const useAnalisaModalKerja = {
-    permohonan_nasabah_type: null,
-    status_nasabah_type: null,
     latar_belakang: {
         sikap: null,
         kemudahan_type: null,

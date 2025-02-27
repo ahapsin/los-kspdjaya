@@ -1,9 +1,29 @@
 <template>
   <n-card title="form isian analisa">
     <template #header-extra>
-      <n-tag>Modal Kerja</n-tag>
-      <n-tag>Investasi</n-tag>
-      <n-tag>Konsumsi</n-tag>
+      <n-radio
+          checked
+          value="Definitely Maybe"
+          name="basic-demo"
+      >
+        Modal Kerja
+      </n-radio>
+      <n-radio
+          :checked="checkedValue === 'Definitely Maybe'"
+          value="Definitely Maybe"
+          name="basic-demo"
+          @change="handleChange"
+      >
+        Investasi
+      </n-radio>
+      <n-radio
+          value="Definitely Maybe"
+          name="basic-demo"
+          @change="handleChange"
+      >
+        Konsumsi
+      </n-radio>
+
     </template>
     <div class="p-2 group border flex justify-between  items-center rounded-lg">
       <div class="flex gap-2">
@@ -15,19 +35,51 @@
       </div>
 
       <div class="flex gap-2">
-        <n-button type="primary" secondary @click="modalSt = true">Preview Form</n-button>
+        <!--        <n-button type="primary" secondary @click="modalSt = true">Preview Form</n-button>-->
         <n-button type="info" @click="modalSt = true">Detail</n-button>
       </div>
 
     </div>
-    <div>
-      {{ useAnalisaModalKerja }}
-    </div>
-    <div>
-      <n-select :options="optModalKerja.analisa_kuantitatif"/>
+    <div class="flex flex-col gap-y-4 pt-4">
+      <n-card>
+        <div class="grid  grid-cols-2 gap-4 bg-slate-50 p-4">
+          <n-form-item label="Permohonan nasabah">
+            <n-select/>
+          </n-form-item>
+          <n-form-item label="Status nasabah">
+            <n-select/>
+          </n-form-item>
+        </div>
+      </n-card>
+<!--      <n-card v-for="param in modelArray(useAnalisaModalKerja)" :key="param.id">-->
+<!--        <div class="flex justify-between">-->
+<!--          <div class="text-lg font-bold">{{ param.replace("_", " ").toUpperCase() }}</div>-->
+<!--          <n-switch></n-switch>-->
+<!--        </div>-->
+<!--        <div class="bg-slate-50 p-4">-->
+<!--          asdasd-->
+<!--        </div>-->
+<!--      </n-card>-->
+      <n-card>
+        <div class="flex justify-between">
+          <div class="text-lg font-bold">
+            Sikap
+          </div>
+          <n-switch></n-switch>
+        </div>
+        <div class="bg-slate-50 p-4">
+          <div class="grid  grid-cols-2 gap-4 bg-slate-50 p-4">
+            <n-form-item label="Permohonan nasabah">
+              <n-select/>
+            </n-form-item>
+            <n-form-item label="Status nasabah">
+              <n-select/>
+            </n-form-item>
+          </div>
+        </div>
+      </n-card>
     </div>
   </n-card>
-
 </template>
 <script setup>
 import _ from "lodash";
@@ -80,4 +132,5 @@ const findMatchParameter = (col, val) => {
   return a > 0 ? col[a] : col[0];
 }
 const currentStatus = ref("process");
+const modelArray = (e) => Object.keys(e).map(key => key);
 </script>

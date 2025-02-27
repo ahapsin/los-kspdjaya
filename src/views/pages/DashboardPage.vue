@@ -1,14 +1,22 @@
 <template>
-  <n-card>Hi,<b>{{me.me.nama}} 👋</b>
+  <n-card :class="`bg-gradient-to-r from-[${appbase}] to-[#ff0000]`">
+    Hi,<b>{{ me.me.nama }} 👋</b>
   </n-card>
+<!--  <n-card>-->
+<!--    <div v-for="dashCard in me.me.accessMenu">-->
+<!--      {{ dashCard }}-->
+<!--    </div>-->
+<!--  </n-card>-->
 </template>
 <script setup>
 import _ from "lodash";
 import {useMessage} from "naive-ui";
 import {useApi} from "../../helpers/axios.js";
 import {useMeStore} from "../../stores/me.js";
+
 const appbackdrop = import.meta.env.VITE_APP_BACKDROP;
-const me=useMeStore();
+const appbase = import.meta.env.VITE_APP_BASE_COLOR;
+const me = useMeStore();
 const message = useMessage();
 const dataMenu = ref();
 const getMenu = async () => {
