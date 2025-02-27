@@ -81,6 +81,7 @@
                       {{ dataFooter.ttlDenda.toLocaleString() }}
                     </th>
                     <th align="right">
+                      {{ dataFooter.ttlBayarDenda.toLocaleString() }}
                     </th>
                     <th align="right">
                     </th>
