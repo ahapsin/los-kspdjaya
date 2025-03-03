@@ -2,11 +2,13 @@
   <n-card :class="`bg-gradient-to-r from-[${appbase}] to-[#ff0000]`">
     Hi,<b>{{ me.me.nama }} 👋</b>
   </n-card>
-<!--  <n-card>-->
-<!--    <div v-for="dashCard in me.me.accessMenu">-->
-<!--      {{ dashCard }}-->
-<!--    </div>-->
-<!--  </n-card>-->
+  <div class="grid grid-flow-dense grid-cols-4 gap-2 mt-2">
+    <n-card v-for="dashCard in me.me.accessMenu" :title="dashCard">
+      <div>
+        {{ dashCard }}
+      </div>
+    </n-card>
+  </div>
 </template>
 <script setup>
 import _ from "lodash";

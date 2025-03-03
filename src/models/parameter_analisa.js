@@ -42,7 +42,7 @@ export const useAnalisaModalKerja = [{
 },
     {
         key: 1,
-        param: "aspek teknis",
+        param: "aspek usaha",
         paramlist: {
             tempat_usaha: {
                 title: "tempat usaha",
