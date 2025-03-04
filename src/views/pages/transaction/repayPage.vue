@@ -393,7 +393,10 @@ const dynamicSearch = reactive({
   no_polisi: "",
   no_kontrak: "",
 });
-
+const {handlePrint} = useVueToPrint({
+  content: printReceiptRef,
+  documentTitle: "Kwitansi Pelunasan",
+});
 const handleResBack = (data) => {
   dataBuktiTransfer.value = data;
 }
