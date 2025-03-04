@@ -3,52 +3,7 @@
     <n-space vertical>
       <n-card :title="`Laporan data Jaminan`" :segmented="true" size="small">
         <template #header-extra>
-          <!--          <n-space class="!gap-1">-->
-          <!--            <div class="me-1 flex gap-2">-->
-          <!--              <n-date-picker-->
-          <!--                v-model:value="timestamp"-->
-          <!--                type="month"-->
-          <!--                 :default-value="Date.now()"-->
-          <!--                format="y MMM"-->
-          <!--                month-format="MMM"-->
-          <!--                clearable-->
-          <!--              />-->
-          <!--              <n-popover trigger="click" placement="bottom-end">-->
-          <!--                <template #trigger>-->
-          <!--                  <n-button circle>-->
-          <!--                    <n-icon>-->
-          <!--                      <search-icon />-->
-          <!--                    </n-icon>-->
-          <!--                  </n-button>-->
-          <!--                </template>-->
-          <!--                <n-input-->
-          <!--                  autofocus="true"-->
-          <!--                  clearable-->
-          <!--                  placeholder="cari disini.."-->
-          <!--                  v-model:value="searchBox"-->
-          <!--                />-->
-          <!--              </n-popover>-->
-          <!--            </div>-->
-          <!--            <div>-->
-          <!--              <n-button type="primary" secondary>-->
-          <!--                <template #icon>-->
-          <!--                  <n-icon>-->
-          <!--                    <download-icon />-->
-          <!--                  </n-icon>-->
-          <!--                </template>-->
-          <!--                Download-->
-          <!--              </n-button>-->
-          <!--            </div>-->
-          <!--            <div class="md:hidden">-->
-          <!--              <n-button type="primary" @click="handleAdd">-->
-          <!--                <template #icon>-->
-          <!--                  <n-icon>-->
-          <!--                    <add-icon />-->
-          <!--                  </n-icon>-->
-          <!--                </template>-->
-          <!--              </n-button>-->
-          <!--            </div>-->
-          <!--          </n-space>-->
+
           <json-excel v-if="showData.length > 0" :data="showData" :name="`laporan_jaminan_${dynamicSearch.pos}`"
                       :fields="json_fields"
                       :stringifyLongNum="true">

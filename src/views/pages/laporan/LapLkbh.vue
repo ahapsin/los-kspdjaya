@@ -6,8 +6,8 @@
     <div>
       <n-space vertical :size="12" class="pt-4">
         <n-space>
-          <n-date-picker v-model:value="rangeDate" :default-value="Date.now()" clearable
-                         start-placeholder="dari" end-placeholder="sampai"/>
+          <n-date-picker v-model:formatted-value="rangeDate" :default-calendar-start-time="Date.now()" clearable
+                         start-placeholder="dari" type="daterange" end-placeholder="sampai" format="yyyy-MM-dd"/>
           <n-select
               v-show="me.me.cabang_nama == 'Head Office'"
               :loading="loadingBranch"
@@ -41,7 +41,7 @@
             </div>
             <div class="text-md font-bold justify-center pt-4 flex flex-col text-right">
               <n-text>LAPORAN KEUANGAN BERBASI HARIAN (LKBH)</n-text>
-              <n-text class="text-sm">tanggal : {{ formatDate(dataArusKas.tgl_tarik) }}</n-text>
+              <n-text class="text-sm">tanggal : {{ formatDate(dataArusKas.dari) }}-{{ formatDate(dataArusKas.sampai) }}</n-text>
 
             </div>
           </div>
@@ -403,9 +403,11 @@ const jumlahKan = (e) => {
 }
 const handleSubmit = async () => {
   let a = {
-    dari: rangeDate.value ? rangeDate.value : Date.now(),
+    dari: rangeDate.value[0],
+    sampai: rangeDate.value[1],
     cabang_id: selectBranch.value ? selectBranch.value : null
   }
+  console.log(a)
   await getArusKas(a);
 }
 
