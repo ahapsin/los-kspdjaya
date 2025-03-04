@@ -127,7 +127,7 @@
               <div class="flex gap-2 items-center">
                 <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
                 <div class="flex flex-col">
-                  <span class="text-xl font-bold">apptitle</span>
+                  <span class="text-xl font-bold">{{apptitle}}</span>
                   <n-text strong class="text-md"> POS: {{ bodyModal.lokasi }}</n-text>
                 </div>
               </div>
