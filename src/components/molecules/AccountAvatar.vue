@@ -8,7 +8,8 @@
     <n-dropdown trigger="hover" :options="options">
       <div class="flex items-center gap-4">
                 <span class="flex flex-col items-end">
-                  <n-text type="primary"><strong>{{ dataUser?.nama }}</strong></n-text>
+
+                  <n-text type="primary" class="hidden md:flex"><strong>{{ dataUser?.nama }}</strong></n-text>
                     <small class="text-primary hidden md:flex uppercase"> POS :{{ dataUser?.cabang_nama }}</small>
                 </span>
         <n-avatar round size="medium" class="aspect-square" :src="dataUser
@@ -16,8 +17,8 @@
                     : 'https://icones.pro/wp-content/uploads/2021/02/icone-utilisateur-vert.png'
                     ">
           {{ dataUser?.nama.at(0) }}
-        </n-avatar>
 
+        </n-avatar>
       </div>
     </n-dropdown>
 
@@ -37,7 +38,8 @@ import {
 import {useApi} from "../../helpers/axios";
 import {useMeStore} from "../../stores/me";
 import {useTaskStore} from "../../stores/task";
-
+import {useWindowSize} from "@vueuse/core";
+const { width } = useWindowSize();
 const message = useMessage();
 
 const dataUser = ref();

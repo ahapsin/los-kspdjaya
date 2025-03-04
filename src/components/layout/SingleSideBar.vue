@@ -27,7 +27,7 @@
                 alt="logo_company"
             />
             <div class="flex flex-col items-left justify-center">
-              <span>{{ apptitle }}</span>
+              <n-ellipsis style="max-width: 150px">{{ apptitle }}</n-ellipsis>
               <span class="text-[10px]">v. {{ appVersion }}</span>
             </div>
           </n-space>
