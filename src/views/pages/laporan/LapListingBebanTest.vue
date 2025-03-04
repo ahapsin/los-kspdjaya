@@ -93,7 +93,7 @@ const grabListBan = async (e) => {
   let userToken = localStorage.getItem("token");
   const response = await useApi({
     method: "POST",
-    api: "listBan",
+    api: "listBanTest",
     data: e,
     token: userToken,
   });
