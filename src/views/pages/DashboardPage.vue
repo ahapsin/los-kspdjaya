@@ -1,13 +1,14 @@
 <template>
-  <n-card :class="`bg-gradient-to-r from-[${appbase}] to-[#ff0000]`">
+  <n-card >
     Hi,<b>{{ me.me.nama }} 👋</b>
   </n-card>
-  <div class="grid grid-flow-dense grid-cols-4 gap-2 mt-2">
+  <div class="grid grid-flow-dense grid-cols-2 gap-2 mt-2">
     <n-card v-for="dashCard in me.me.accessMenu" :title="dashCard">
       <div>
         {{ dashCard }}
       </div>
     </n-card>
+    {{findAccessMenu('Oas') ?'a' : 'b'}}
   </div>
 </template>
 <script setup>
@@ -33,6 +34,10 @@ const getMenu = async () => {
   } else {
     dataMenu.value = response.data.response;
   }
+}
+
+const findAccessMenu = (e) => {
+ return _.includes(me.me.accessMenu,e);
 }
 onMounted(() => {
   getMenu();

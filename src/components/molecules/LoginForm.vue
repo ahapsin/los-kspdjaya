@@ -11,11 +11,11 @@
       </div>
       <div class=" h-full flex flex-col py-4">
         <n-form-item label="username" path="username" :rule="rules.username">
-          <n-input v-model:value="dynamicForm.username" placeholder="username"/>
+          <n-input v-model:value="dynamicForm.username" placeholder="username" />
         </n-form-item>
         <n-form-item label="password" path="password" :rule="rules.password">
           <n-input type="password" v-model:value="dynamicForm.password" placeholder="Password"
-                   show-password-on="mousedown" @keyup.enter="handleLogin"/>
+                   show-password-on="mousedown" @keyup.enter="handleLogin" />
         </n-form-item>
         <n-button class="flex w-full" :loading="loading" icon-placement="left" type="primary"
                   @click="handleLogin">
@@ -29,11 +29,10 @@
   </div>
 </template>
 <script setup>
-import {ref, reactive, onMounted} from "vue";
-import {useMessage} from "naive-ui";
-import {useMeStore} from "../../stores/me";
+import { ref, reactive, onMounted } from "vue";
+import { useMessage } from "naive-ui";
 import router from '../../router';
-import {useApi} from "../../helpers/axios";
+import { useApi } from "../../helpers/axios";
 import pjson from '../../../package.json';
 
 const apptitle = import.meta.env.VITE_APP_TITLE;
@@ -78,13 +77,9 @@ const handleLogin = async (e) => {
     }
   });
   if (!response.ok) {
-    if (response.error.status == 503) {
-      router.push('no-service');
-    } else if (response.error.status == 500) {
-      message.error("login gagal");
-      loading.value = false;
-    } else {
-      message.error(response.error.data.message);
+
+    if (response.error.status == 503) { router.push('no-service'); } else {
+      message.error("login gagal,periksa username dan password anda !");
       loading.value = false;
     }
   } else {
@@ -95,7 +90,7 @@ const handleLogin = async (e) => {
     router.go();
   }
 }
-const me = useMeStore();
+
 const logged = ref(false);
 onMounted(() => {
   logged.value = true;
@@ -111,7 +106,6 @@ onMounted(() => {
         message.warning("sesi anda sudah berakhir");
         router.go('/');
       } else {
-        me.storeMe(res.data.response);
         router.push('/');
         logged.value = false;
       }
