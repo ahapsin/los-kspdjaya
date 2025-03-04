@@ -334,6 +334,10 @@ const routes = [
                 path: "list_ban",
                 name: "Listing Beban",
                 component: () => import("../views/pages/laporan/LapListingBeban.vue"),
+            }, {
+                path: "lap_pembayaran",
+                name: "Laporan Pembayaran",
+                component: () => import("../views/pages/laporan/LapPembayaran.vue"),
             },{
                 path: "list_ban_test",
                 name: "Listing Beban test",
