@@ -4,8 +4,7 @@
       <n-space vertical :size="12" class="pt-4">
         <n-space>
           <n-form-item label="TANGGAL AKHIR">
-            <n-date-picker v-model:formatted-value="rangeDate" :default-value="Date.now()" clearable
-                           format="yyyy-MM-dd"/>
+            <n-date-picker v-model:formatted-value="rangeDate" format="MMyyyy" type="month" clearable />
           </n-form-item>
           <n-form-item label="POS">
             <n-select :loading="loadingBranch" filterable placeholder="Pilih POS" label-field="nama"
