@@ -21,8 +21,10 @@
 <script setup>
 import {ref, onMounted} from 'vue';
 import Dashboard from './DashboardPage.vue';
+
 const appAccentColor = import.meta.env.VITE_APP_ACCENT_COLOR;
 const logged = ref(false);
+
 onMounted(() => {
   appAccentColor;
   if (localStorage.getItem("token")) {

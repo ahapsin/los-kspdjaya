@@ -1,6 +1,7 @@
 <template>
   <n-tabs size="medium" @update:value="handleUpdateValue" class="card-tabs" default-value="jaminan" animated
           type="card" pane-wrapper-style="margin: 0 -4px"
+          @before-leave="handleSwitchTab"
           pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;">
     <n-tab-pane name="jaminan" tab="Jaminan">
       <template #tab>
@@ -10,7 +11,9 @@
       </template>
       <div class="flex w-full mb-2 justify-between px-4">
         <n-statistic label="Jaminan tersedia di POS">
-          {{ showData.length }}
+          <n-spin size="small" :show="loadTable">
+            {{ showData.length }}
+          </n-spin>
         </n-statistic>
         <n-popover trigger="click" placement="bottom-end">
           <template #trigger>
@@ -21,19 +24,20 @@
             </n-button>
           </template>
           <n-space vertical>
-            <n-input autofocus="true" clearable placeholder="Cari No Kontrak / Nama Debitur"
+            <n-input clearable placeholder="Cari No Kontrak / Nama Debitur"
                      v-model:value="searchBox"/>
           </n-space>
         </n-popover>
       </div>
 
-      <n-data-table :columns="columns" :data="showData" size="small" :pagination="{pageSize:10}"/>
+      <n-data-table :columns="columns" :data="showData" :loading="loadTable" size="small" :pagination="{pageSize:10}"/>
     </n-tab-pane>
     <n-tab-pane name="transaksi" tab="Transaksi">
-      <n-data-table :columns="columnsTransaction" :data="dataTransaction" size="small"/>
+      <n-data-table :columns="columnsTransaction" :data="dataTransaction" size="small" :loading="loadTransaction"/>
     </n-tab-pane>
-    <n-tab-pane name="Approval" tab="Approval">
-      <n-data-table :columns="columnsTransactionApproval" :data="dataTransactionApproval" size="small"/>
+    <n-tab-pane name="approval" tab="approval">
+      <n-data-table :columns="columnsTransactionApproval" :data="dataTransactionApproval" size="small"
+                    :loading="loadTransactionApproval"/>
     </n-tab-pane>
     <template #suffix>
       <n-dropdown trigger="hover" :options="options" @select="handleSelect" v-if="addButtonDisplay">
@@ -50,7 +54,7 @@
       <FormUpdate @batal="showModal = false" v-if="typeTransaksi == 'update'"/>
     </div>
   </n-modal>
-  <n-modal v-model:show="showDetailModal" title="Modal">
+  <n-modal v-model:show="showDetailModal" title="Modal" :on-after-leave="closeModal">
     <n-card class="w-2/3">
       <n-tabs>
         <n-tab-pane name="detail" tab="Detail Jaminan ">
@@ -60,7 +64,7 @@
             <tr>
               <th>Jenis</th>
               <th>Nama Debitur</th>
-              <th>Order Number</th>
+              <th>No Kontrak</th>
               <th>No Jaminan</th>
               <th>Lokasi</th>
               <th>Status</th>
@@ -116,18 +120,29 @@
         </n-tab-pane>
         <n-tab-pane name="rilis" tab="Rilis Jaminan">
           <n-result
-              v-if="bodyModal.status_kontrak != 'active'"
+              v-if="bodyModal.status_kontrak == 'active' && bodyModal.status_jaminan != 'RILIS'"
               status="403"
               title="Rilis Jaminan Tidak Tersedia"
               description="Terdapat kredit aktif, jaminan tidak dapat diproses rilis !"
+          ></n-result>
+          <div
+              v-else-if="bodyModal.status_jaminan == 'RILIS'"
           >
-          </n-result>
+            <div class="border p-2 rounded-xl">
+              <n-alert type="warning">Jaminan Telah Rilis</n-alert>
+              <div>
+                <n-divider title-placement="left">Dokumen Rilis</n-divider>
+                <n-image v-for="doc in bodyModal.document_rilis" :src="doc.PATH" :key="doc.id"
+                         class="w-24  rounded-xl"/>
+              </div>
+            </div>
+          </div>
           <div v-else>
             <div class="bg-white border border-black p-4" ref="buktiTerimaRef">
               <div class="flex gap-2 items-center">
                 <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
                 <div class="flex flex-col">
-                  <span class="text-xl font-bold">apptitle</span>
+                  <span class="text-xl font-bold">{{ apptitle }}</span>
                   <n-text strong class="text-md"> POS: {{ bodyModal.lokasi }}</n-text>
                 </div>
               </div>
@@ -152,7 +167,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>No Order</td>
+                    <td>No Kontrak</td>
                     <td width="25">:</td>
                     <td>
                       <b class="uppercase">{{ bodyModal.order_number }}</b>
@@ -252,11 +267,15 @@
                 </table>
               </div>
             </div>
-            <n-collapse class="p-2 rounded-xl border mt-2 shadow bg-sc-50/50" v-if="bodyModal.status_kontrak=='active'">
+            <n-collapse class="p-2 rounded-xl border mt-2 shadow bg-sc-50/50">
               <n-collapse-item title="Rilis Dokumen" name="1">
                 <div class="flex bg-white  p-2 rounded-xl flex-col gap-2">
-                  <n-button type="info" dashed @click="cetakBuktiTerima">Cetak Bukti Terima</n-button>
-                  <file-upload title="Upload bukti terima " endpoint="image_upload_prospect" type="ktp"/>
+                  <n-button type="info" dashed @click="cetakBuktiTerima">Cetak Bukti Rilis</n-button>
+                  <n-alert type="warning">
+                    upload dokumen rilis yang sudah dicap dan ditanda tangani pemberi dan penerima
+                  </n-alert>
+                  <file-upload title="Upload bukti rilis" endpoint="collateral_attachment_rilis" :idapp="bodyModal.id"
+                               type="doc_rilis" :def_value="findDocByType(bodyModal.document_rilis, 'doc_rilis')"/>
                 </div>
               </n-collapse-item>
             </n-collapse>
@@ -286,7 +305,7 @@
               :src="applogo"
               alt="logo_company"
           />
-          <span class="text-2xl font-bold">{{apptitle}}</span>
+          <span class="text-2xl font-bold">{{ apptitle }}</span>
         </div>
         <n-table :bordered="false" :single-line="false" size="small">
           <thead>
@@ -416,6 +435,8 @@ import {useSearch} from '../../../helpers/searchObject';
 import {reactive} from 'vue';
 import {useVueToPrint} from "vue-to-print";
 import {useMeStore} from "../../../stores/me.js";
+import _ from "lodash";
+
 const apptitle = import.meta.env.VITE_APP_TITLE;
 const applogo = import.meta.env.VITE_APP_LOGO;
 const me = useMeStore();
@@ -424,7 +445,10 @@ const showModal = ref(false);
 const dataTable = ref([]);
 const dataTransaction = ref([]);
 const dataTransactionApproval = ref([]);
+const loadTransactionApproval = ref();
+const loadTable = ref(false);
 const getData = async () => {
+  loadTable.value = true;
   let userToken = localStorage.getItem("token");
   const response = await useApi({
     method: "GET",
@@ -432,8 +456,10 @@ const getData = async () => {
     token: userToken,
   });
   if (!response.ok) {
+    loadTable.value = false;
     message.error("ERROR API (J2)");
   } else {
+    loadTable.value = false;
     dataTable.value = response.data;
   }
 };
@@ -499,7 +525,13 @@ const dayFull = reactive({
       () => `${dayFull.day}, ${dayFull.date} ${dayFull.month} ${dayFull.year}`
   ),
 });
+const findDocByType = (c, e) => {
+  const docPath = ref(_.find(c, {TYPE: e}));
+  if (docPath.value) return docPath.value.PATH;
+};
+const loadTransaction = ref(false);
 const getDataTransaction = async () => {
+  loadTransaction.value = true;
   let userToken = localStorage.getItem("token");
   const response = await useApi({
     method: "GET",
@@ -507,15 +539,16 @@ const getDataTransaction = async () => {
     token: userToken,
   });
   if (!response.ok) {
+    loadTransaction.value = false;
     message.error('ERROR API');
   } else {
-    message.info("memuat transaksi jaminan");
-
+    loadTransaction.value = false;
     dataTransaction.value = response.data;
   }
 };
 const loadingBar = useLoadingBar();
 const getDataTransactionApproval = async () => {
+  loadTransactionApproval.value = true;
   let userToken = localStorage.getItem("token");
   const response = await useApi({
     method: "GET",
@@ -523,10 +556,11 @@ const getDataTransactionApproval = async () => {
     token: userToken,
   });
   if (!response.ok) {
+    loadTransactionApproval.value = false;
     message.error("ERROR API");
   } else {
     loadingBar.finish();
-    message.info("memuat transaksi jaminan approval");
+    loadTransactionApproval.value = false;
     dataTransactionApproval.value = response.data;
   }
 };
@@ -745,7 +779,11 @@ const {handlePrint} = useVueToPrint({
 });
 const checkedRowJaminan = ref([]);
 const cetakBuktiTerima = () => {
-  handlePrintBuktiTerima;
+  const {handlePrint} = useVueToPrint({
+    content: buktiTerimaRef,
+    documentTitle: "Surat Rilis Jaminan",
+  });
+  handlePrint();
 }
 const modelJaminan = ref();
 const bodyApprove = reactive({
@@ -863,11 +901,27 @@ const detailTrxApproval = (e) => {
   bodyModalTrx.value = e;
   modalTrxApproval.value = true;
 }
+const closeModal = () => {
+  getData();
+}
 
+const handleSwitchTab = (t) => {
+  switch (t) {
+    case "jaminan":
+      getData();
+      return true;
+    case "transaksi":
+      getDataTransaction();
+      return true;
+    case "approval":
+      getDataTransactionApproval();
+      return true;
+    default:
+      return true;
+  }
+}
 onMounted(() => {
   getData();
-  getDataTransaction();
-  getDataTransactionApproval();
 });
 
 
