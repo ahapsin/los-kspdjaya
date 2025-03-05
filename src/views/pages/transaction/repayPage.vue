@@ -509,10 +509,6 @@ const formPelunasan = reactive({
 });
 
 
-const {handlePrint} = useVueToPrint({
-  content: printReceiptRef,
-  documentTitle: "Kwitansi Pelunasan",
-});
 const handleCetakKwitansi = () => {
   handlePrint();
   router.go(-1)

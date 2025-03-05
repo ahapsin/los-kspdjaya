@@ -1,7 +1,7 @@
 {
   "name": "los-app",
   "private": true,
-  "version": "3.5 (calm)",
+  "version": "4.0 (Delightful)",
   "type": "module",
   "scripts": {
     "dev": "vite",
