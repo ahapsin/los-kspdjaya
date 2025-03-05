@@ -52,7 +52,7 @@ const getData = async () => {
         data.value = response.data;
     }
 }
-const createdSuccess = computed(() => _.filter(data.value, { 'STATUS': 'PENDING' }));
+const createdSuccess = computed(() => _.filter(data.value, {}));
 const pendingPayment = computed(() => _.filter(data.value, { 'STATUS': 'PENDING' }));
 const sumPaidPayment = computed(() => createdSuccess.value.reduce((sum, i) => sum + i.jumlah_uang, 0));
 const sumPendingPayment = computed(() => pendingPayment.value.reduce((sum, i) => sum + i.jumlah_uang, 0));
