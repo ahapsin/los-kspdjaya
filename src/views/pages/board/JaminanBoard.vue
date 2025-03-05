@@ -1,24 +1,24 @@
 <template>
-    <n-card  size="small" :segmented="{
+    <n-card title="Jaminan" size="small" :segmented="{
         content: true,
         footer: 'soft',
     }">
-        <template #header>Transaksi <n-tag size="small" type="info">bulan berjalan</n-tag></template>
+    <template #title>adsa</template>
         <template #header-extra>
-            <n-button @click="router.push({ name:'pembayaran'})" size="small" quaternary>detail</n-button>
+            <n-button @click="router.push({ name:'jaminan'})" size="small" quaternary>detail</n-button>
         </template>
         <n-spin :show="loadData">
             <div class="grid grid-cols-2 justify-stretch">
-                <n-statistic label="Pembayaran Berhasil">
+                <n-statistic label="Tersedia di POS">
                     {{ createdSuccess.length }}
                 </n-statistic>
-                <n-statistic label="Jml. Pemb. Berhasil">
+                <n-statistic label="Dalam Proses">
                     {{ sumPaidPayment.toLocaleString() }}
                 </n-statistic>
-                <n-statistic label="Pemb. Pending">
+                <n-statistic label="Diluar POS">
                     {{ pendingPayment.length }}
                 </n-statistic>
-                <n-statistic label="Jml. Pemb. Pending">
+                <n-statistic label="Total Jaminan">
                     {{ sumPendingPayment.toLocaleString() }}
                 </n-statistic>
             </div>
@@ -41,7 +41,7 @@ const getData = async () => {
     let userToken = localStorage.getItem("token");
     const response = await useApi({
         method: 'GET',
-        api: 'payment',
+        api: 'jaminan',
         token: userToken
     });
     if (!response.ok) {
@@ -52,7 +52,7 @@ const getData = async () => {
         data.value = response.data;
     }
 }
-const createdSuccess = computed(() => _.filter(data.value, { 'STATUS': 'PAID' }));
+const createdSuccess = computed(() => _.filter(data.value, { 'STATUS': 'PENDING' }));
 const pendingPayment = computed(() => _.filter(data.value, { 'STATUS': 'PENDING' }));
 const sumPaidPayment = computed(() => createdSuccess.value.reduce((sum, i) => sum + i.jumlah_uang, 0));
 const sumPendingPayment = computed(() => pendingPayment.value.reduce((sum, i) => sum + i.jumlah_uang, 0));
