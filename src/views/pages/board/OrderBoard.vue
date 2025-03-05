@@ -1,8 +1,9 @@
 <template>
-    <n-card title="Credit" size="small" :segmented="{
+    <n-card  size="small" :segmented="{
         content: true,
         footer: 'soft',
     }">
+        <template #header>Credit <n-tag size="small" type="info">bulan berjalan</n-tag></template>
         <template #header-extra>
             <n-button @click="router.push({ name: 'Order' })" size="small" quaternary>detail</n-button>
         </template>

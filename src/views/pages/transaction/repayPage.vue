@@ -426,7 +426,7 @@ const createColumns = () => {
         },
         {
             title: "Angsuran",
-            key: "angsuran",
+        key: "angsuran",
             align: "right",
             render(row) {
                 return h("div", formatter.format(row.angsuran));
