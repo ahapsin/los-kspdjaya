@@ -1,424 +1,420 @@
 <template>
-  <n-tabs size="medium" @update:value="handleUpdateValue" class="card-tabs" default-value="jaminan" animated
-          type="card" pane-wrapper-style="margin: 0 -4px"
-          @before-leave="handleSwitchTab"
-          pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;">
-    <n-tab-pane name="jaminan" tab="Jaminan">
-      <template #tab>
-        <div>
-          Jaminan
-        </div>
-      </template>
-      <div class="flex w-full mb-2 justify-between px-4">
-        <n-statistic label="Jaminan tersedia di POS">
-          <n-spin size="small" :show="loadTable">
-            {{ showData.length }}
-          </n-spin>
-        </n-statistic>
-        <n-popover trigger="click" placement="bottom-end">
-          <template #trigger>
-            <n-button circle>
-              <n-icon>
-                <search-icon/>
-              </n-icon>
-            </n-button>
-          </template>
-          <n-space vertical>
-            <n-input clearable placeholder="Cari No Kontrak / Nama Debitur"
-                     v-model:value="searchBox"/>
-          </n-space>
-        </n-popover>
-      </div>
-
-      <n-data-table :columns="columns" :data="showData" :loading="loadTable" size="small" :pagination="{pageSize:10}"/>
-    </n-tab-pane>
-    <n-tab-pane name="transaksi" tab="Transaksi">
-      <n-data-table :columns="columnsTransaction" :data="dataTransaction" size="small" :loading="loadTransaction"/>
-    </n-tab-pane>
-    <n-tab-pane name="approval" tab="approval">
-      <n-data-table :columns="columnsTransactionApproval" :data="dataTransactionApproval" size="small"
-                    :loading="loadTransactionApproval"/>
-    </n-tab-pane>
-    <template #suffix>
-      <n-dropdown trigger="hover" :options="options" @select="handleSelect" v-if="addButtonDisplay">
-        <n-button type="primary">Tambah Transaksi</n-button>
-      </n-dropdown>
-    </template>
-  </n-tabs>
-  <n-modal v-model:show="showModal" :mask-closable="false">
-    <div class="w-1/2">
-      <FormTransaksi @batal="showModal = false" v-if="typeTransaksi == 'kirim'" @simpan="handleSimpanModal"
-                     type="pengiriman"/>
-      <FormTransaksi @batal="showModal = false" v-if="typeTransaksi == 'minta'" @simpan="handleSimpanModal"
-                     type="permintan"/>
-      <FormUpdate @batal="showModal = false" v-if="typeTransaksi == 'update'"/>
-    </div>
-  </n-modal>
-  <n-modal v-model:show="showDetailModal" title="Modal" :on-after-leave="closeModal">
-    <n-card class="w-2/3">
-      <n-tabs>
-        <n-tab-pane name="detail" tab="Detail Jaminan ">
-
-          <n-table :bordered="false" :single-line="false" size="small">
-            <thead>
-            <tr>
-              <th>Jenis</th>
-              <th>Nama Debitur</th>
-              <th>No Kontrak</th>
-              <th>No Jaminan</th>
-              <th>Lokasi</th>
-              <th>Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>{{ bodyModal.type }}</td>
-              <td>{{ bodyModal.nama_debitur }}</td>
-              <td>{{ bodyModal.order_number }}</td>
-              <td>{{ bodyModal.no_jaminan }}</td>
-              <td>{{ bodyModal.lokasi }}</td>
-              <td>{{ bodyModal.status_jaminan }}</td>
-            </tr>
-            </tbody>
-          </n-table>
-          <n-table :bordered="false" :single-line="false" size="small">
-            <tbody>
-            <tr>
-              <th>BPKB NO</th>
-              <td>{{ bodyModal.no_bpkb }}</td>
-            </tr>
-            <tr>
-              <th>BPKB Atas Nama</th>
-              <td>{{ bodyModal.atas_nama }}</td>
-            </tr>
-            <tr>
-              <th>Merk/Tipe/Tahun</th>
-              <td>{{ bodyModal.merk }} / {{ bodyModal.tipe }} / {{ bodyModal.tahun }}</td>
-            </tr>
-            <tr>
-              <th>Warna/No Polisi</th>
-              <td>{{ bodyModal.warna }} /{{ bodyModal.no_polisi }}</td>
-            </tr>
-            <tr>
-              <th>No Rangka/No Mesin</th>
-              <td>{{ bodyModal.no_rangka }}/ {{ bodyModal.no_mesin }}</td>
-            </tr>
-            <tr>
-              <th>No Faktur</th>
-              <td>{{ bodyModal.no_faktur }}</td>
-            </tr>
-            <tr>
-              <th>Dokumen</th>
-              <td>
-                <n-image v-for="doc in bodyModal.document" width="64" height="64" :src="doc.PATH"
-                         :key="doc"/>
-              </td>
-            </tr>
-            </tbody>
-          </n-table>
-
-        </n-tab-pane>
-        <n-tab-pane name="rilis" tab="Rilis Jaminan">
-          <n-result
-              v-if="bodyModal.status_kontrak == 'active' && bodyModal.status_jaminan != 'RILIS'"
-              status="403"
-              title="Rilis Jaminan Tidak Tersedia"
-              description="Terdapat kredit aktif, jaminan tidak dapat diproses rilis !"
-          ></n-result>
-          <div
-              v-else-if="bodyModal.status_jaminan == 'RILIS'"
-          >
-            <div class="border p-2 rounded-xl">
-              <n-alert type="warning">Jaminan Telah Rilis</n-alert>
-              <div>
-                <n-divider title-placement="left">Dokumen Rilis</n-divider>
-                <n-image v-for="doc in bodyModal.document_rilis" :src="doc.PATH" :key="doc.id"
-                         class="w-24  rounded-xl"/>
-              </div>
-            </div>
-          </div>
-          <div v-else>
-            <div class="bg-white border border-black p-4" ref="buktiTerimaRef">
-              <div class="flex gap-2 items-center">
-                <img class="h-10 md:h-10" :src="applogo" alt="logo_company"/>
-                <div class="flex flex-col">
-                  <span class="text-xl font-bold">{{ apptitle }}</span>
-                  <n-text strong class="text-md"> POS: {{ bodyModal.lokasi }}</n-text>
+    <n-tabs size="medium" @update:value="handleUpdateValue" class="card-tabs" default-value="jaminan" animated
+        type="card" pane-wrapper-style="margin: 0 -4px" @before-leave="handleSwitchTab"
+        pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;">
+        <n-tab-pane name="jaminan" tab="Jaminan">
+            <template #tab>
+                <div>
+                    Jaminan
                 </div>
-              </div>
-              <div class="mb-4 text-center text-base">
-                <b>SURAT TANDA TERIMA DOKUMEN</b>
-              </div>
-              <div class="mb-4">yang bertanda tangan di bawah ini:</div>
-              <div class="mb-4">
-                <table>
-                  <tr>
-                    <td width="100px">Nama</td>
-                    <td width="25">:</td>
-                    <td>
-                      <b class="uppercase">{{ bodyModal.nama_debitur }}</b>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>No Jaminan</td>
-                    <td width="25">:</td>
-                    <td>
-                      <b class="uppercase">{{ bodyModal.no_jaminan }}</b>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>No Kontrak</td>
-                    <td width="25">:</td>
-                    <td>
-                      <b class="uppercase">{{ bodyModal.order_number }}</b>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-              <div class="mb-4 text-justify text-sm">
-                Pada hari ini <b>{{ dayFull.day }}</b> tanggal
-                <b>{{ dayFull.date }}</b> bulan <b>{{ dayFull.month }}</b> tahun
-                <b>{{ dayFull.year }}</b>,Dengan ini telah menerima buku kepemilikan kendaraan (BPKB)
-                dalam keadaan baik dengan rincian sebagai berikut :
-              </div>
-              <div class="text-justify pt-2">
-                Jenis Dokumen: <b> </b>
-                <table v-if="bodyModal.type.toLowerCase() == 'kendaraan'">
-                  <tr>
-                    <td>BPKB No</td>
-                    <td width="25">:</td>
-                    <td>{{ bodyModal.no_bpkb }}</td>
-                  </tr>
-                  <tr>
-                    <td>BPKB atas nama</td>
-                    <td width="25">:</td>
-                    <td>{{ bodyModal.atas_nama }}</td>
-                  </tr>
-                  <tr>
-                    <td>Merk/Type/Tahun</td>
-                    <td width="25">:</td>
-                    <td>{{ bodyModal.merk }}/{{ bodyModal.tipe }}/{{ bodyModal.tahun }}</td>
-                  </tr>
-                  <tr>
-                    <td>Warna/No.Polisi</td>
-                    <td width="25">:</td>
-                    <td>{{ bodyModal.warna }}/{{ bodyModal.no_polisi }}</td>
-                  </tr>
-                  <tr>
-                    <td>No. Rangka/Mesin</td>
-                    <td width="25">:</td>
-                    <td>{{ bodyModal.no_rangka }}/{{ bodyModal.no_mesin }}</td>
-                  </tr>
-                  <tr>
-                    <td>No. Faktur</td>
-                    <td width="25">:</td>
-                    <td>{{ bodyModal.no_faktur }}</td>
-                  </tr>
-                </table>
-                <table v-else>
-                  <tr>
-                    <td>No Sertifikat</td>
-                    <td width="25">:</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Atas Nama</td>
-                    <td width="25">:</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Status Kepemilikan</td>
-                    <td width="25">:</td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>IMB / Luas Tanah / Luas Bangunan</td>
-                    <td width="25">:</td>
-                    <td>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Lokasi</td>
-                    <td width="25">:</td>
-                    <td></td>
-                  </tr>
-                </table>
-              </div>
-
-              <div class="mb-4">
-                <!-- Selanjutnya disebut Penjamin<br /> -->
-                Dokumen tersebut telah diterima dalam keadaan baik untuk
-                ditindaklanjuti sebagaimana mestinya
-              </div>
-              <div>
-                <table class="!text-sm w-full">
-                  <tr>
-                    <td class="py-4 pr-4">
-                      Pemberi,
-                      <br/><br/><br/>
-                      <u class="uppercase">{{ me.me.nama }}</u>
-                    </td>
-                    <td class="py-4 pr-4">
-                      Penerima,
-                      <br/><br/><br/>
-                      <u class="uppercase">{{ bodyModal.nama_debitur }}</u>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <n-collapse class="p-2 rounded-xl border mt-2 shadow bg-sc-50/50">
-              <n-collapse-item title="Rilis Dokumen" name="1">
-                <div class="flex bg-white  p-2 rounded-xl flex-col gap-2">
-                  <n-button type="info" dashed @click="cetakBuktiTerima">Cetak Bukti Rilis</n-button>
-                  <n-alert type="warning">
-                    upload dokumen rilis yang sudah dicap dan ditanda tangani pemberi dan penerima
-                  </n-alert>
-                  <file-upload title="Upload bukti rilis" endpoint="collateral_attachment_rilis" :idapp="bodyModal.id"
-                               type="doc_rilis" :def_value="findDocByType(bodyModal.document_rilis, 'doc_rilis')"/>
+            </template>
+            <div class="flex w-full mb-2 justify-between px-4">
+                <n-statistic label="Jaminan tersedia di POS">
+                    <n-spin size="small" :show="loadTable">
+                        {{ showData.length }}
+                    </n-spin>
+                </n-statistic>
+                <div class="flex gap-2">
+                    <n-popover trigger="click" placement="bottom-end">
+                        <template #trigger>
+                            <n-button circle>
+                                <n-icon>
+                                    <search-icon />
+                                </n-icon>
+                            </n-button>
+                        </template>
+                        <n-space vertical>
+                            <n-input clearable placeholder="Cari No Kontrak / Nama Debitur" v-model:value="searchBox" />
+                        </n-space>
+                    </n-popover>
+                    <json-excel v-if="showData.length > 0" :data="showData"
+                        :name="`laporan_jaminan`" :fields="json_fields" :stringifyLongNum="true">
+                        <n-button type="primary">Download Xls</n-button>
+                    </json-excel>
                 </div>
-              </n-collapse-item>
-            </n-collapse>
-          </div>
+            </div>
+
+            <n-data-table :columns="columns" :data="showData" :loading="loadTable" size="small"
+                :pagination="{pageSize:10}" />
         </n-tab-pane>
-      </n-tabs>
+        <n-tab-pane name="transaksi" tab="Transaksi">
+            <n-data-table :columns="columnsTransaction" :data="dataTransaction" size="small"
+                :loading="loadTransaction" />
+        </n-tab-pane>
+        <n-tab-pane name="approval" tab="approval">
+            <n-data-table :columns="columnsTransactionApproval" :data="dataTransactionApproval" size="small"
+                :loading="loadTransactionApproval" />
+        </n-tab-pane>
+        <template #suffix>
+            <n-dropdown trigger="hover" :options="options" @select="handleSelect" v-if="addButtonDisplay">
+                <n-button type="primary">Tambah Transaksi</n-button>
+            </n-dropdown>
+        </template>
+    </n-tabs>
+    <n-modal v-model:show="showModal" :mask-closable="false">
+        <div class="w-1/2">
+            <FormTransaksi @batal="showModal = false" v-if="typeTransaksi == 'kirim'" @simpan="handleSimpanModal"
+                type="pengiriman" />
+            <FormTransaksi @batal="showModal = false" v-if="typeTransaksi == 'minta'" @simpan="handleSimpanModal"
+                type="permintan" />
+            <FormUpdate @batal="showModal = false" v-if="typeTransaksi == 'update'" />
+        </div>
+    </n-modal>
+    <n-modal v-model:show="showDetailModal" title="Modal" :on-after-leave="closeModal">
+        <n-card class="w-2/3">
+            <n-tabs>
+                <n-tab-pane name="detail" tab="Detail Jaminan ">
+
+                    <n-table :bordered="false" :single-line="false" size="small">
+                        <thead>
+                            <tr>
+                                <th>Jenis</th>
+                                <th>Nama Debitur</th>
+                                <th>No Kontrak</th>
+                                <th>No Jaminan</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ bodyModal.type }}</td>
+                                <td>{{ bodyModal.nama_debitur }}</td>
+                                <td>{{ bodyModal.order_number }}</td>
+                                <td>{{ bodyModal.no_jaminan }}</td>
+                                <td>{{ bodyModal.lokasi }}</td>
+                                <td>{{ bodyModal.status_jaminan }}</td>
+                            </tr>
+                        </tbody>
+                    </n-table>
+                    <n-table :bordered="false" :single-line="false" size="small">
+                        <tbody>
+                            <tr>
+                                <th>BPKB NO</th>
+                                <td>{{ bodyModal.no_bpkb }}</td>
+                            </tr>
+                            <tr>
+                                <th>BPKB Atas Nama</th>
+                                <td>{{ bodyModal.atas_nama }}</td>
+                            </tr>
+                            <tr>
+                                <th>Merk/Tipe/Tahun</th>
+                                <td>{{ bodyModal.merk }} / {{ bodyModal.tipe }} / {{ bodyModal.tahun }}</td>
+                            </tr>
+                            <tr>
+                                <th>Warna/No Polisi</th>
+                                <td>{{ bodyModal.warna }} /{{ bodyModal.no_polisi }}</td>
+                            </tr>
+                            <tr>
+                                <th>No Rangka/No Mesin</th>
+                                <td>{{ bodyModal.no_rangka }}/ {{ bodyModal.no_mesin }}</td>
+                            </tr>
+                            <tr>
+                                <th>No Faktur</th>
+                                <td>{{ bodyModal.no_faktur }}</td>
+                            </tr>
+                            <tr>
+                                <th>Dokumen</th>
+                                <td>
+                                    <n-image v-for="doc in bodyModal.document" width="64" height="64" :src="doc.PATH"
+                                        :key="doc" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </n-table>
+
+                </n-tab-pane>
+                <n-tab-pane name="rilis" tab="Rilis Jaminan">
+                    <n-result v-if="bodyModal.status_kontrak == 'active' && bodyModal.status_jaminan != 'RILIS'"
+                        status="403" title="Rilis Jaminan Tidak Tersedia"
+                        description="Terdapat kredit aktif, jaminan tidak dapat diproses rilis !"></n-result>
+                    <div v-else-if="bodyModal.status_jaminan == 'RILIS'">
+                        <div class="border p-2 rounded-xl">
+                            <n-alert type="warning">Jaminan Telah Rilis</n-alert>
+                            <div>
+                                <n-divider title-placement="left">Dokumen Rilis</n-divider>
+                                <n-image v-for="doc in bodyModal.document_rilis" :src="doc.PATH" :key="doc.id"
+                                    class="w-24  rounded-xl" />
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div class="bg-white border border-black p-4" ref="buktiTerimaRef">
+                            <div class="flex gap-2 items-center">
+                                <img class="h-10 md:h-10" :src="applogo" alt="logo_company" />
+                                <div class="flex flex-col">
+                                    <span class="text-xl font-bold">{{ apptitle }}</span>
+                                    <n-text strong class="text-md"> POS: {{ bodyModal.lokasi }}</n-text>
+                                </div>
+                            </div>
+                            <div class="mb-4 text-center text-base">
+                                <b>SURAT TANDA TERIMA DOKUMEN</b>
+                            </div>
+                            <div class="mb-4">yang bertanda tangan di bawah ini:</div>
+                            <div class="mb-4">
+                                <table>
+                                    <tr>
+                                        <td width="100px">Nama</td>
+                                        <td width="25">:</td>
+                                        <td>
+                                            <b class="uppercase">{{ bodyModal.nama_debitur }}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>No Jaminan</td>
+                                        <td width="25">:</td>
+                                        <td>
+                                            <b class="uppercase">{{ bodyModal.no_jaminan }}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>No Kontrak</td>
+                                        <td width="25">:</td>
+                                        <td>
+                                            <b class="uppercase">{{ bodyModal.order_number }}</b>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="mb-4 text-justify text-sm">
+                                Pada hari ini <b>{{ dayFull.day }}</b> tanggal
+                                <b>{{ dayFull.date }}</b> bulan <b>{{ dayFull.month }}</b> tahun
+                                <b>{{ dayFull.year }}</b>,Dengan ini telah menerima buku kepemilikan kendaraan (BPKB)
+                                dalam keadaan baik dengan rincian sebagai berikut :
+                            </div>
+                            <div class="text-justify pt-2">
+                                Jenis Dokumen: <b> </b>
+                                <table v-if="bodyModal.type.toLowerCase() == 'kendaraan'">
+                                    <tr>
+                                        <td>BPKB No</td>
+                                        <td width="25">:</td>
+                                        <td>{{ bodyModal.no_bpkb }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>BPKB atas nama</td>
+                                        <td width="25">:</td>
+                                        <td>{{ bodyModal.atas_nama }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Merk/Type/Tahun</td>
+                                        <td width="25">:</td>
+                                        <td>{{ bodyModal.merk }}/{{ bodyModal.tipe }}/{{ bodyModal.tahun }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Warna/No.Polisi</td>
+                                        <td width="25">:</td>
+                                        <td>{{ bodyModal.warna }}/{{ bodyModal.no_polisi }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>No. Rangka/Mesin</td>
+                                        <td width="25">:</td>
+                                        <td>{{ bodyModal.no_rangka }}/{{ bodyModal.no_mesin }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>No. Faktur</td>
+                                        <td width="25">:</td>
+                                        <td>{{ bodyModal.no_faktur }}</td>
+                                    </tr>
+                                </table>
+                                <table v-else>
+                                    <tr>
+                                        <td>No Sertifikat</td>
+                                        <td width="25">:</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Atas Nama</td>
+                                        <td width="25">:</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Status Kepemilikan</td>
+                                        <td width="25">:</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>IMB / Luas Tanah / Luas Bangunan</td>
+                                        <td width="25">:</td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lokasi</td>
+                                        <td width="25">:</td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="mb-4">
+                                <!-- Selanjutnya disebut Penjamin<br /> -->
+                                Dokumen tersebut telah diterima dalam keadaan baik untuk
+                                ditindaklanjuti sebagaimana mestinya
+                            </div>
+                            <div>
+                                <table class="!text-sm w-full">
+                                    <tr>
+                                        <td class="py-4 pr-4">
+                                            Pemberi,
+                                            <br /><br /><br />
+                                            <u class="uppercase">{{ me.me.nama }}</u>
+                                        </td>
+                                        <td class="py-4 pr-4">
+                                            Penerima,
+                                            <br /><br /><br />
+                                            <u class="uppercase">{{ bodyModal.nama_debitur }}</u>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <n-collapse class="p-2 rounded-xl border mt-2 shadow bg-sc-50/50">
+                            <n-collapse-item title="Rilis Dokumen" name="1">
+                                <div class="flex bg-white  p-2 rounded-xl flex-col gap-2">
+                                    <n-button type="info" dashed @click="cetakBuktiTerima">Cetak Bukti Rilis</n-button>
+                                    <n-alert type="warning">
+                                        upload dokumen rilis yang sudah dicap dan ditanda tangani pemberi dan penerima
+                                    </n-alert>
+                                    <file-upload title="Upload bukti rilis" endpoint="collateral_attachment_rilis"
+                                        :idapp="bodyModal.id" type="doc_rilis"
+                                        :def_value="findDocByType(bodyModal.document_rilis, 'doc_rilis')" />
+                                </div>
+                            </n-collapse-item>
+                        </n-collapse>
+                    </div>
+                </n-tab-pane>
+            </n-tabs>
 
 
-    </n-card>
-  </n-modal>
-  <n-modal v-model:show="modalTrx" title="Modal">
-    <n-card class="w-2/3" title="Data Surat">
-      <template #header-extra>
-        <n-button type="primary" @click="handlePrint">
-          <n-space>
-            <n-icon>
-              <print-icon/>
-            </n-icon>
-            Cetak Surat
-          </n-space>
-        </n-button>
-      </template>
-      <div ref="printArea" class="p-4">
-        <div class="flex gap-2 p-4">
-          <img
-              class="h-10 md:h-10"
-              :src="applogo"
-              alt="logo_company"
-          />
-          <span class="text-2xl font-bold">{{ apptitle }}</span>
-        </div>
-        <n-table :bordered="false" :single-line="false" size="small">
-          <thead>
-          <tr>
-            <th>No Surat</th>
-            <th>Transaksi</th>
-            <th>Tanggal</th>
-            <th>Dari</th>
-            <th>Ke</th>
-            <th>Status</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>{{ bodyModalTrx.trx_code }}</td>
-            <td>{{ bodyModalTrx.type }}</td>
-            <td>{{ bodyModalTrx.tgl }}</td>
-            <td>{{ bodyModalTrx.dari_cabang }}</td>
-            <td>{{ bodyModalTrx.ke_cabang }}</td>
-            <td>{{ bodyModalTrx.status }}</td>
-          </tr>
-          </tbody>
-        </n-table>
-        <n-table :bordered="false" :single-line="false" size="small">
-          <tr>
-            <th style="width:10%">Kurir</th>
-            <td>{{ bodyModalTrx.kurir }}</td>
-          </tr>
-          <tr>
-            <th>Keterangan</th>
-            <td>{{ bodyModalTrx.keterangan }}</td>
-          </tr>
-        </n-table>
-        <h1 class="font-semibold py-4">Data Jaminan</h1>
-        <n-data-table :row-key="(row) => row.id" :checked-row-keys="checkedRowJaminan" :bordered="false"
-                      :single-line="false" size="small"
-                      :columns="bodyModalTrx.status == 'SELESAI'?columnsJaminan:columnsJaminanApprove"
-                      :data="bodyModalTrx.jaminan"
-                      :on-update:checked-row-keys="handleCheckedJaminan">
-        </n-data-table>
-        <div class="flex flex-col border-b border-dashed pb-4 ms-3 pt-4">
-          <div class="flex gap-4">
-            <div class="border-b pb-20 px-4 w-36">
-              <n-text strong class="text-md font-bold"> {{ bodyModalTrx.dari_cabang }}</n-text>
-            </div>
-            <div class="border-b pb-20 px-4 w-36">
-              <n-text strong class="text-md font-bold"> {{ bodyModalTrx.kurir }}</n-text>
-            </div>
-            <div class="border-b pb-20 px-4 w-36">
-              <n-text strong class="text-md font-bold"> {{ bodyModalTrx.ke_cabang }}</n-text>
-            </div>
-          </div>
-        </div>
-        <div v-if="bodyModalTrx.status !='SELESAI' ">
-          <n-form-item label="keterangan" class="pt-2">
-            <n-input type="textarea" v-model:value="bodyApprove.keterangan"/>
-          </n-form-item>
-          <n-button type="primary" @click="handleApprove">approve</n-button>
-        </div>
-      </div>
-    </n-card>
-  </n-modal>
-  <n-modal v-model:show="modalTrxApproval" title="Modal">
-    <n-card class="w-2/3">
-      <h1 class="font-semibold py-4">Data Surat</h1>
-      <n-table :bordered="false" :single-line="false" size="small">
-        <thead>
-        <tr>
-          <th>No Surat</th>
-          <th>Transaksi</th>
-          <th>Tanggal</th>
-          <th>Dari</th>
-          <th>Ke</th>
-          <th>Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>{{ bodyModalTrx.trx_code }}</td>
-          <td>{{ bodyModalTrx.type }}</td>
-          <td>{{ bodyModalTrx.tgl }}</td>
-          <td>{{ bodyModalTrx.dari_cabang }}</td>
-          <td>{{ bodyModalTrx.ke_cabang }}</td>
-          <td>{{ bodyModalTrx.status }}</td>
-        </tr>
-        </tbody>
-      </n-table>
-      <n-table :bordered="false" :single-line="false" size="small">
-        <tr>
-          <th style="width:10%">Kurir</th>
-          <td>{{ bodyModalTrx.kurir }}</td>
-        </tr>
-        <tr>
-          <th>Keterangans</th>
-          <td>{{ bodyModalTrx.keterangan }}</td>
-        </tr>
-      </n-table>
-      <h1 class="font-semibold py-4">Data Jaminan</h1>
-      <n-data-table :row-key="(row) => row.id" :checked-row-keys="checkedRowJaminan" :bordered="false"
+        </n-card>
+    </n-modal>
+    <n-modal v-model:show="modalTrx" title="Modal">
+        <n-card class="w-2/3" title="Data Surat">
+            <template #header-extra>
+                <n-button type="primary" @click="handlePrint">
+                    <n-space>
+                        <n-icon>
+                            <print-icon />
+                        </n-icon>
+                        Cetak Surat
+                    </n-space>
+                </n-button>
+            </template>
+            <div ref="printArea" class="p-4">
+                <div class="flex gap-2 p-4">
+                    <img class="h-10 md:h-10" :src="applogo" alt="logo_company" />
+                    <span class="text-2xl font-bold">{{ apptitle }}</span>
+                </div>
+                <n-table :bordered="false" :single-line="false" size="small">
+                    <thead>
+                        <tr>
+                            <th>No Surat</th>
+                            <th>Transaksi</th>
+                            <th>Tanggal</th>
+                            <th>Dari</th>
+                            <th>Ke</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ bodyModalTrx.trx_code }}</td>
+                            <td>{{ bodyModalTrx.type }}</td>
+                            <td>{{ bodyModalTrx.tgl }}</td>
+                            <td>{{ bodyModalTrx.dari_cabang }}</td>
+                            <td>{{ bodyModalTrx.ke_cabang }}</td>
+                            <td>{{ bodyModalTrx.status }}</td>
+                        </tr>
+                    </tbody>
+                </n-table>
+                <n-table :bordered="false" :single-line="false" size="small">
+                    <tr>
+                        <th style="width:10%">Kurir</th>
+                        <td>{{ bodyModalTrx.kurir }}</td>
+                    </tr>
+                    <tr>
+                        <th>Keterangan</th>
+                        <td>{{ bodyModalTrx.keterangan }}</td>
+                    </tr>
+                </n-table>
+                <h1 class="font-semibold py-4">Data Jaminan</h1>
+                <n-data-table :row-key="(row) => row.id" :checked-row-keys="checkedRowJaminan" :bordered="false"
                     :single-line="false" size="small"
                     :columns="bodyModalTrx.status == 'SELESAI'?columnsJaminan:columnsJaminanApprove"
-                    :data="bodyModalTrx.jaminan"
-                    :on-update:checked-row-keys="handleCheckedJaminan">
-      </n-data-table>
+                    :data="bodyModalTrx.jaminan" :on-update:checked-row-keys="handleCheckedJaminan">
+                </n-data-table>
+                <div class="flex flex-col border-b border-dashed pb-4 ms-3 pt-4">
+                    <div class="flex gap-4">
+                        <div class="border-b pb-20 px-4 w-36">
+                            <n-text strong class="text-md font-bold"> {{ bodyModalTrx.dari_cabang }}</n-text>
+                        </div>
+                        <div class="border-b pb-20 px-4 w-36">
+                            <n-text strong class="text-md font-bold"> {{ bodyModalTrx.kurir }}</n-text>
+                        </div>
+                        <div class="border-b pb-20 px-4 w-36">
+                            <n-text strong class="text-md font-bold"> {{ bodyModalTrx.ke_cabang }}</n-text>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="bodyModalTrx.status !='SELESAI' ">
+                    <n-form-item label="keterangan" class="pt-2">
+                        <n-input type="textarea" v-model:value="bodyApprove.keterangan" />
+                    </n-form-item>
+                    <n-button type="primary" @click="handleApprove">approve</n-button>
+                </div>
+            </div>
+        </n-card>
+    </n-modal>
+    <n-modal v-model:show="modalTrxApproval" title="Modal">
+        <n-card class="w-2/3">
+            <h1 class="font-semibold py-4">Data Surat</h1>
+            <n-table :bordered="false" :single-line="false" size="small">
+                <thead>
+                    <tr>
+                        <th>No Surat</th>
+                        <th>Transaksi</th>
+                        <th>Tanggal</th>
+                        <th>Dari</th>
+                        <th>Ke</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ bodyModalTrx.trx_code }}</td>
+                        <td>{{ bodyModalTrx.type }}</td>
+                        <td>{{ bodyModalTrx.tgl }}</td>
+                        <td>{{ bodyModalTrx.dari_cabang }}</td>
+                        <td>{{ bodyModalTrx.ke_cabang }}</td>
+                        <td>{{ bodyModalTrx.status }}</td>
+                    </tr>
+                </tbody>
+            </n-table>
+            <n-table :bordered="false" :single-line="false" size="small">
+                <tr>
+                    <th style="width:10%">Kurir</th>
+                    <td>{{ bodyModalTrx.kurir }}</td>
+                </tr>
+                <tr>
+                    <th>Keterangans</th>
+                    <td>{{ bodyModalTrx.keterangan }}</td>
+                </tr>
+            </n-table>
+            <h1 class="font-semibold py-4">Data Jaminan</h1>
+            <n-data-table :row-key="(row) => row.id" :checked-row-keys="checkedRowJaminan" :bordered="false"
+                :single-line="false" size="small"
+                :columns="bodyModalTrx.status == 'SELESAI'?columnsJaminan:columnsJaminanApprove"
+                :data="bodyModalTrx.jaminan" :on-update:checked-row-keys="handleCheckedJaminan">
+            </n-data-table>
 
-      <div v-if="bodyModalTrx.status !='SELESAI' ">
-        <n-form-item label="keterangan" class="pt-2">
-          <n-input type="textarea" v-model:value="bodyApprove.keterangan"/>
-        </n-form-item>
-        <n-button type="primary" @click="handleApprove">approve</n-button>
-      </div>
-    </n-card>
-  </n-modal>
+            <div v-if="bodyModalTrx.status !='SELESAI' ">
+                <n-form-item label="keterangan" class="pt-2">
+                    <n-input type="textarea" v-model:value="bodyApprove.keterangan" />
+                </n-form-item>
+                <n-button type="primary" @click="handleApprove">approve</n-button>
+            </div>
+        </n-card>
+    </n-modal>
 </template>
 
 <script setup>
@@ -436,6 +432,7 @@ import {reactive} from 'vue';
 import {useVueToPrint} from "vue-to-print";
 import {useMeStore} from "../../../stores/me.js";
 import _ from "lodash";
+import JsonExcel from "vue-json-excel3";
 
 const apptitle = import.meta.env.VITE_APP_TITLE;
 const applogo = import.meta.env.VITE_APP_LOGO;
@@ -457,7 +454,7 @@ const getData = async () => {
   });
   if (!response.ok) {
     loadTable.value = false;
-    message.error("ERROR API (J2)");
+    message.error("ERROR API");
   } else {
     loadTable.value = false;
     dataTable.value = response.data;
