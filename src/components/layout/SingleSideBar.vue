@@ -2,7 +2,7 @@
   <n-layout class="h-screen">
     <n-layout-header style="height: 64px" bordered>
       <n-page-header
-          class="sticky bg-sc-50 border-b top-0 z-50 backdrop-blur p-4"
+          class="sticky bg-scf border-b top-0 z-50 backdrop-blur p-4"
       >
         <template #title>
           <n-space align="center">
@@ -53,7 +53,7 @@
         <SideMenu/>
       </n-layout-sider>
       <n-layout :native-scrollbar="false"
-                :class="`p-2 md:p-4 bg-gradient-to-t from-slate-100`">
+                :class="`p-2 md:p-4 bg-slate-100`">
         <RouterView/>
         <slot/>
       </n-layout>

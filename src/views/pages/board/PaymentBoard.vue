@@ -1,11 +1,17 @@
 <template>
-    <n-card  size="small" :segmented="{
+    <n-card size="small" :segmented="{
         content: true,
         footer: 'soft',
     }">
         <template #header>Transaksi <n-tag size="small" type="info">bulan berjalan</n-tag></template>
         <template #header-extra>
-            <n-button @click="router.push({ name:'pembayaran'})" size="small" quaternary>detail</n-button>
+            <n-dropdown trigger="click" :options="options" @select="handleSelect">
+                <n-button  size="small" secondary circle>
+                    <n-icon>
+                        <option-icon />
+                    </n-icon>
+                </n-button>
+            </n-dropdown>
         </template>
         <n-spin :show="loadData">
             <div class="grid grid-cols-2 justify-stretch">
@@ -32,6 +38,7 @@ import { ref, computed, onMounted } from "vue";
 import { useMessage } from 'naive-ui';
 import { useApi } from "../../../helpers/axios.js";
 import router from "../../../router/index.js";
+import { DotsVertical as OptionIcon } from "@vicons/tabler";
 
 const loadData = ref(false);
 const data = ref([]);
@@ -52,6 +59,20 @@ const getData = async () => {
         data.value = response.data;
     }
 }
+const options =[
+    {
+        label: "Pembayaran",
+        key: "pembayaran",
+    },
+    {
+        label: "Pelunasan",
+        key: "pelunasan",
+    },
+    {
+        label: "Detail",
+        key: "detail",
+    },
+];
 const createdSuccess = computed(() => _.filter(data.value, { 'STATUS': 'PAID' }));
 const pendingPayment = computed(() => _.filter(data.value, { 'STATUS': 'PENDING' }));
 const sumPaidPayment = computed(() => createdSuccess.value.reduce((sum, i) => sum + i.jumlah_uang, 0));
