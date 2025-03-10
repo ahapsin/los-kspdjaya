@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full bg-white rounded-lg p-4">
+    <div class="w-full bg-white min-h-[500px] max-h-[500px] rounded-lg p-4 overflow-auto">
       <div class="flex sticky bg-yellow-50 top-0 z-50 justify-end rounded-xl p-4" v-if="bucketParam?.length">
         <n-button type="success" class="shadow" @click="prevModal = true">Preview</n-button>
       </div>

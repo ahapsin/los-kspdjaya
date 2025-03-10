@@ -42,10 +42,9 @@
                 <template #tab>
                     <div class="flex gap-2">
                         <div>Approval</div>
-                        <n-tag type="warning">{{ _.filter(dataTransactionApproval, { 'status': 'SENDING' }).length }}</n-tag>
+
                     </div>
                 </template>
-
                 <n-data-table :columns="columnsTransactionApproval" :data="dataTransactionApproval" size="small"
                     :loading="loadTransactionApproval" :pagination="{pageSize:10}" />
             </n-tab-pane>
