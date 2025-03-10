@@ -49,6 +49,7 @@
           <n-button type="primary" @click="handleSearch" class="px-4"> Cari</n-button>
         </n-form-item>
       </div>
+
       <n-data-table ref="tableRef" striped size="small" :row-key="(row) => row.loan_number" :columns="columns"
                     :scroll-x="870" :data="showData" :max-height="500" :on-update:checked-row-keys="handleFasilitas"
                     :loading="loadDataPayment" class="p-4" :pagination="{ pageSize: 10 }"/>

@@ -37,6 +37,7 @@ import {
 import {useApi} from "../../helpers/axios";
 import {useMeStore} from "../../stores/me";
 import {useTaskStore} from "../../stores/task";
+import {useCollateralStore} from "../../stores/collateral.js";
 
 const message = useMessage();
 
@@ -91,6 +92,7 @@ const options = [
 ];
 const me = useMeStore();
 const task = useTaskStore();
+const coll = useCollateralStore();
 const approvalCenter = () => {
   router.push({name: "approval-center"})
 }
@@ -116,6 +118,22 @@ const GetMe = async () => {
     task.storeTask(response.data.response);
   }
 };
+
+// const getDataColl = async () => {
+//   let userToken = localStorage.getItem("token");
+//
+//   const response = await useApi({
+//     method: "GET",
+//     api: "jaminan",
+//     token: userToken,
+//   });
+//   if (!response.ok) {
+//     console.log(response);
+//   } else {
+//     coll.storeCollateral(response.data);
+//   }
+// };
+
 const GetPayment = async () => {
   let userToken = localStorage.getItem("token");
   const response = await useApi({
