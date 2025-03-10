@@ -17,6 +17,11 @@ const routes = [
         path: "/test-view",
         name: "testview",
         component: () => import("../views/pages/TestViewPage.vue"),
+    },
+    {
+        path: "/playground",
+        name: "playground",
+        component: () => import("../views/pages/PlaygroundPage.vue"),
     }, {
         path: "/pass-pk",
         name: "pass pk",
