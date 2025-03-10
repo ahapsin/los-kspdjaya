@@ -9,13 +9,13 @@
         </template>
         <n-spin :show="loadData">
             <div class="grid grid-cols-2 justify-stretch">
-                <n-statistic label="Tersedia di POS">
+                <n-statistic label="Tersedia">
                     {{ collData.collateral.ondemand?.toLocaleString() }}
                 </n-statistic>
                 <n-statistic label="Dalam Proses">
                     {{ collData.collateral.onProcess?.toLocaleString() }}
                 </n-statistic>
-                <n-statistic label="Diluar POS">
+                <n-statistic label="Diluar">
                     {{ collData.collateral.onGoing?.toLocaleString() }}
                 </n-statistic>
                 <n-statistic label="Total Jaminan">
