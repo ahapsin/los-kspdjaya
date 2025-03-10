@@ -49,7 +49,7 @@
           <n-button type="primary" @click="handleSearch" class="px-4"> Cari</n-button>
         </n-form-item>
       </div>
-      {{collData}}
+
       <n-data-table ref="tableRef" striped size="small" :row-key="(row) => row.loan_number" :columns="columns"
                     :scroll-x="870" :data="showData" :max-height="500" :on-update:checked-row-keys="handleFasilitas"
                     :loading="loadDataPayment" class="p-4" :pagination="{ pageSize: 10 }"/>
@@ -308,12 +308,10 @@ import {
 import {useWindowSize} from "@vueuse/core";
 import {useLoadingBar} from "naive-ui";
 
-const collData = useCollateralStore();
 const loadingBar = useLoadingBar();
 import {useMessage, NIcon, NTag, NButton, NInput, NImage} from "naive-ui";
 import {computed, onMounted, reactive, ref, h} from "vue";
 import {useVueToPrint} from "vue-to-print";
-import {useCollateralStore} from "../../../stores/collateral.js";
 const apptitle = import.meta.env.VITE_APP_TITLE;
 const applogo = import.meta.env.VITE_APP_LOGO;
 const uploadState = ref(false);
