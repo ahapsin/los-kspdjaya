@@ -22,10 +22,12 @@ const routes = [
         path: "/playground",
         name: "playground",
         component: () => import("../views/pages/PlaygroundPage.vue"),
+
     }, {
         path: "/pass-pk",
         name: "pass pk",
         component: () => import("../views/pages/PassPKView.vue"),
+
     },
     {
         path: "/dashboard",
